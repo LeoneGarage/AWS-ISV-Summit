@@ -1,23 +1,16 @@
 # Databricks notebook source
-# MAGIC %md ## Data Processing
-# MAGIC 
-# MAGIC Next, we will clean up the data a little and prepare it for our machine learning model.
-# MAGIC 
-# MAGIC We will first remove the columns that we have identified earlier that have too many distinct categories and cannot be converted to numeric.
-
-# COMMAND ----------
-
-# MAGIC %run ../utils/setup
+# MAGIC %md
+# MAGIC <img src="https://leone.z22.web.core.windows.net/images/TrainingFeatures.png" />
+# MAGIC <img src="https://leone.z22.web.core.windows.net/images/InferenceFeatures.png" />
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 
-# MAGIC ### This is where we do feature engineering, though I'm only cleansing the data in this case.
-# MAGIC ### I'm reading the Change Data Feed from Delta and doing some minor transformations on the fly before saving the Feature Table as Delta table
-# MAGIC ### Note, I'm only deleting the checkpoint location for demo purposes, so the pipeline starts from beginning every time it's run. You wouldn't be doing this in production.
-# MAGIC ### Also for more complex feature engineering requiring more complex aggregations, you would most likely transform into features as a periodic batch job and save to Delta and publish to low latency store as part of that.
-# MAGIC ### You would still do inference from those features while streaming or via REST APIs, in real time. The features would then be lagging a bit behind inference.
+# MAGIC ### Import common variables & functions
+
+# COMMAND ----------
+
+# MAGIC %run ../utils/setup
 
 # COMMAND ----------
 
@@ -36,18 +29,23 @@ triggerOnce = dbutils.widgets.getArgument("triggerOnce")
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC 
+# MAGIC ### This is where we do feature engineering.
+# MAGIC ### We are reading the Change Data Feed from Delta and doing some minor transformations on the fly before saving the Feature Table as Delta table.
+
+# COMMAND ----------
+
 def compute_features(data):
   df = data
 
-#   df = df.withColumn('incident_month', month('incident_date'))
-#   df = df.withColumn('incident_day_of_month', dayofmonth('incident_date'))
-#   df = df.withColumn('incident_day_of_week', dayofweek('incident_date'))
   df = (
         df.withColumn('incident_weekend_flag', when(dayofweek('incident_date') == 1, 1).when(dayofweek('incident_date') == 7, 1). otherwise(0))
           .withColumn('months_as_customer', months_between('incident_date', 'policy_bind_date').cast('int'))
           .withColumn('age', (months_between('incident_date', 'date_of_birth')/12).cast('int'))
        )
 
+  # Drop columns which are not useful for ML
   df = df.drop('date_of_birth').drop('policy_bind_date').drop('incident_date').drop('_rescued_data')
 
   # Drop missing values
@@ -66,15 +64,9 @@ def incremental_features():
 
 # COMMAND ----------
 
-# MAGIC %md Generate transformed dataset. This will be the dataset that we will use to create our machine learning models.
-
-# COMMAND ----------
-
-# MAGIC %md By selecting "label" and "fraud reported", we can infer that 0 corresponds to **No Fraud Reported** and 1 corresponds to **Fraud Reported**.
-
-# COMMAND ----------
-
-# MAGIC %md Next, split data into training and test sets.
+# MAGIC %md
+# MAGIC 
+# MAGIC ### We use Feature Store library to write our features to Feature Store
 
 # COMMAND ----------
 

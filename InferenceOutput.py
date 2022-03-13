@@ -7,6 +7,10 @@ from pyspark.sql.functions import *
 
 # COMMAND ----------
 
+spark.read.format('delta').table(f'{gold_database_name}.insurance_claims').count()
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC 
 # MAGIC ### The following cell waits for gold table to be available before displaying predictions

@@ -12,10 +12,10 @@ features_database_name = f'{database_name}_features'
 
 # COMMAND ----------
 
-location = f'/mnt/fraud/insurance/incoming/insurance_claims*.csv'
+location = f'/mnt/fraud/insurance/incoming'
 targetLocation = f'/mnt/{database_name}/insurance/features/etl'
 checkpointLocation = f'/mnt/{database_name}/insurance/features/etl/cp'
-schemaLocation = f'/mnt/{database_name}/insurance/incoming/etl_schema'
+schemaLocation = f'/mnt/{database_name}/insurance/incoming_schema/etl_schema'
 
 # COMMAND ----------
 

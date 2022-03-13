@@ -1,12 +1,21 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC <img src="https://leone.z22.web.core.windows.net/images/TrainingBronze.png" />
+# MAGIC <img src="https://leone.z22.web.core.windows.net/images/InferenceBronze.png" />
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Import common variables & functions
+
+# COMMAND ----------
+
 # MAGIC %run ../utils/setup
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 
-# MAGIC ### We stream the data in here and will then turn these into features in later Notebook
-# MAGIC ### Note, I'm only deleting checkpoint files and tables here so that the pipeline starts from scratch for demonstration purposes. In production you wouldn't be doing that
+# MAGIC ### Setup Notebook widgets which are also parameters
 
 # COMMAND ----------
 
@@ -23,6 +32,12 @@ from pyspark.sql.types import *
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC 
+# MAGIC ### Stream input CSV files
+
+# COMMAND ----------
+
 insurance_claims_input = (spark.readStream.format("cloudFiles")
       .option("cloudFiles.format", "csv")
       .option("cloudFiles.inferColumnTypes", False)
@@ -30,6 +45,13 @@ insurance_claims_input = (spark.readStream.format("cloudFiles")
       .option("cloudFiles.maxBytesPerTrigger", 100)
       .options(header='true')
       .load(location))
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC 
+# MAGIC ### Replace column names that have spaces with underscores and remove question marks. These are invalid characters for parquet columns
+# MAGIC ### Save resulting data into Bronze table. At this stage we haven't performed any transformations or data type conversions
 
 # COMMAND ----------
 

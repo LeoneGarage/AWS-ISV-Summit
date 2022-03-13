@@ -42,7 +42,7 @@ def generateNewClaims():
   a.dropDuplicates(['policy number', 'property claim', 'injury claim', 'vehicle claim']).repartition(1).write.format('csv').options(header='true').mode('overwrite').save("/mnt/fraud/insurance/files/gen/insurance_claims_incoming.csv.1")
   files = [f for f in dbutils.fs.ls("/mnt/fraud/insurance/files/gen/insurance_claims_incoming.csv.1") if f.name.endswith('.csv')]
   for f in files:
-    dbutils.fs.mv(f.path, f"/mnt/fraud/insurance/incoming/insurance_claims_incoming-{str(uuid.uuid4())}.csv")
+    dbutils.fs.mv(f.path, f"/mnt/fraud/insurance/incoming/gen/insurance_claims_incoming-{str(uuid.uuid4())}.csv")
     dbutils.fs.rm("/mnt/fraud/insurance/files/gen/insurance_claims_incoming.csv.1", True)
 
 # COMMAND ----------

@@ -1,12 +1,21 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC <img src="https://leone.z22.web.core.windows.net/images/TrainingSilver.png" />
+# MAGIC <img src="https://leone.z22.web.core.windows.net/images/InferenceSilver.png" />
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Import common variables & functions
+
+# COMMAND ----------
+
 # MAGIC %run ../utils/setup
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 
-# MAGIC ### We stream the data in here and will then turn these into features in later Notebook
-# MAGIC ### Note, I'm only deleting checkpoint files and tables here so that the pipeline starts from scratch for demonstration purposes. In production you wouldn't be doing that
+# MAGIC ### Setup Notebook widgets which are also parameters
 
 # COMMAND ----------
 
@@ -24,23 +33,38 @@ from delta.tables import *
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ### Read incoming Bronze data as a stream. We know it's append only so we can just read as a standard append only stream and don't need to read as a CDF stream
+
+# COMMAND ----------
+
 bronzeInsuranceClaimsDf = spark.readStream.format("delta").table(f"{bronze_database_name}.insurance_claims")
 
 # COMMAND ----------
 
-conversions = [expr(f"case when({c}='?') then null else {c} end as {c}") for c in spark.read.format('delta').table(f'{silver_database_name}.insurance_claims').columns]
+# MAGIC %md
+# MAGIC ### Since we are ingesting into Silver we will be doing Delta MERGE using foreachBatch() Structured Streaming feature.
+# MAGIC ### This function is doing the actual microbatch batch MERGE and is called by Structured Streaming framework.
+# MAGIC ### We do a merge by primary keys policy_number, property_claim, injury_claim, vehicle_claim. Matching rows are updated and non-matching rows are inserted.
 
 # COMMAND ----------
 
 def upsertToSilver(batchDf, batchId):
   deltaTable = DeltaTable.forName(spark, f'{silver_database_name}.insurance_claims')
-  source = batchDf#.select(conversions)
+  source = batchDf
   deltaTable.alias("u").merge(
     source = source.alias("staged_updates"),
     condition = expr("u.policy_number = staged_updates.policy_number AND u.property_claim = staged_updates.property_claim AND u.injury_claim = staged_updates.injury_claim AND u.vehicle_claim = staged_updates.vehicle_claim")
   ).whenMatchedUpdateAll() \
    .whenNotMatchedInsertAll() \
    .execute()
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### The writeStream() code below performs ingest into Silver.
+# MAGIC ### We perform some simple transforms to convert field values to more appriate data types.
+# MAGIC ### This is where you would do your tranform and MERGE before writing to Silver.
 
 # COMMAND ----------
 
