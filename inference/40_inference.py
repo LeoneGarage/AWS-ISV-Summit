@@ -1,4 +1,9 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC <img src="https://leone.z22.web.core.windows.net/images/InferenceScoring.png" />
+
+# COMMAND ----------
+
 # MAGIC %run ../utils/setup
 
 # COMMAND ----------
