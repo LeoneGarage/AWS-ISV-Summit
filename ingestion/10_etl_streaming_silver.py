@@ -1,7 +1,7 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC <img src="https://leone.z22.web.core.windows.net/images/TrainingSilver.png" />
-# MAGIC <img src="https://leone.z22.web.core.windows.net/images/InferenceSilver.png" />
+# MAGIC <img src="https://github.com/LeoneGarage/AWS-ISV-Summit/blob/master/images/TrainingSilver.png?raw=true" />
+# MAGIC <img src="https://github.com/LeoneGarage/AWS-ISV-Summit/blob/master/images/InferenceSilver.png?raw=true" />
 
 # COMMAND ----------
 

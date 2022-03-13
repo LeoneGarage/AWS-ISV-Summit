@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC <img src="https://leone.z22.web.core.windows.net/images/TrainingFeatures.png" />
+# MAGIC <img src="https://github.com/LeoneGarage/AWS-ISV-Summit/blob/master/images/TrainingFeatures.png?raw=true" />
 
 # COMMAND ----------
 

@@ -11,7 +11,7 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC <img src="https://leone.z22.web.core.windows.net/images/TrainingAutoML.png" />
+# MAGIC <img src="https://github.com/LeoneGarage/AWS-ISV-Summit/blob/master/images/TrainingAutoML.png?raw=true" />
 
 # COMMAND ----------
 
