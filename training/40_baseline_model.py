@@ -265,7 +265,7 @@ with mlflow.start_run(run_name="random_forest") as mlflow_run:
       artifact_path="model",
       flavor=mlflow.sklearn,
       training_set=training_set,
-      registered_model_name='InsuranceFraud'
+      registered_model_name=model_name
     )
 
 # COMMAND ----------

@@ -4,11 +4,12 @@
 # COMMAND ----------
 
 user = dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().apply('user')
-database_name = user.split("@")[0].replace(".", "_")
+database_name = user.split("@")[0].replace(".", "_").replace("-", "_").replace("+", "_")
 bronze_database_name = f'{database_name}_bronze'
 silver_database_name = f'{database_name}_silver'
 gold_database_name = f'{database_name}_gold'
 features_database_name = f'{database_name}_features'
+model_name = f'{database_name}_InsuranceFraud'
 
 # COMMAND ----------
 

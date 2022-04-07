@@ -63,4 +63,3 @@ USING delta
 
 bronzeClearCheckpoints()
 bronzeRecreateTables()
-dbutils.fs.rm(f'{location}/gen', True)

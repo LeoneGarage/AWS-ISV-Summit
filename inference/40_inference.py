@@ -33,7 +33,7 @@ from delta.tables import *
 def get_latest_model(model_name):
   latest_version = 1
   mlflow_client = MlflowClient()
-  return mlflow_client.get_latest_versions("InsuranceFraud", stages=['None'])[0]
+  return mlflow_client.get_latest_versions(model_name, stages=['None'])[0]
 
 
 # COMMAND ----------
@@ -43,8 +43,8 @@ insuranceFeaturesDf = spark.readStream.format("delta").option("readChangeFeed", 
 
 # COMMAND ----------
 
-model_info = get_latest_model("InsuranceFraud")
-model_uri = f'models:/InsuranceFraud/{model_info.version}'
+model_info = get_latest_model(model_name)
+model_uri = f'models:/{model_name}/{model_info.version}'
 
 # COMMAND ----------
 

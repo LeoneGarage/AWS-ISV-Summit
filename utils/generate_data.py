@@ -1,4 +1,12 @@
 # Databricks notebook source
+# MAGIC %run ../utils/setup
+
+# COMMAND ----------
+
+dbutils.fs.rm(f'{location}/gen', True)
+
+# COMMAND ----------
+
 insurance_claims_input = spark.read.format('csv').options(header='true').load("/mnt/fraud/insurance/files/insurance_claims.csv")
 
 # COMMAND ----------
