@@ -59,7 +59,7 @@ def incremental_features():
   # This table will be recomputed incrementalle by reading the silver table stream
   # when it is updated.
   
-  df = spark.readStream.format("delta").option("readChangeFeed", "true").table(f"{silver_database_name}.insurance_claims")
+  df = spark.readStream.format("delta").option("readChangeFeed", "true").table(f"{database_name}.{silver_table_name}")
   return compute_features(df).where("_change_type != 'update_preimage'").drop('_change_type', '_commit_version', '_commit_timestamp')
 
 # COMMAND ----------
@@ -76,16 +76,16 @@ features_df = incremental_features()
 
 if triggerOnce=='true':
   fs.write_table(df=features_df,
-                 name=f'{features_database_name}.insurance_fraud_features',
-                 checkpoint_location=f'{checkpointLocation}/insurance_fraud_features',
+                 name=f'{database_name}.{features_table_name}',
+                 checkpoint_location=f'{checkpointLocation}/{features_table_name}',
                  trigger={'once': True },
                  mode='merge')
 else:
   fs.write_table(df=features_df,
-                 name=f'{features_database_name}.insurance_fraud_features',
-                 checkpoint_location=f'{checkpointLocation}/insurance_fraud_features',
+                 name=f'{database_name}.{features_table_name}',
+                 checkpoint_location=f'{checkpointLocation}/{features_table_name}',
                  mode='merge')
 
 # COMMAND ----------
 
-#display(spark.sql(f'''SELECT * FROM {features_database_name}.insurance_fraud_features'''))
+#display(spark.sql(f'''SELECT * FROM {database_name}.{features_table_name}'''))

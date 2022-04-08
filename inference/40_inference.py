@@ -38,7 +38,7 @@ def get_latest_model(model_name):
 
 # COMMAND ----------
 
-insuranceFeaturesDf = spark.readStream.format("delta").option("readChangeFeed", "true").table(f"{features_database_name}.insurance_fraud_features") \
+insuranceFeaturesDf = spark.readStream.format("delta").option("readChangeFeed", "true").table(f"{database_name}.{features_table_name}") \
                                     .where("_change_type != 'update_preimage'").drop('_change_type', '_commit_version', '_commit_timestamp')
 
 # COMMAND ----------
@@ -48,13 +48,13 @@ model_uri = f'models:/{model_name}/{model_info.version}'
 
 # COMMAND ----------
 
-insuranceClaimsDf = spark.read.format('delta').table(f'{silver_database_name}.insurance_claims')
+insuranceClaimsDf = spark.read.format('delta').table(f'{database_name}.{silver_table_name}')
 
 # COMMAND ----------
 
 def scoreFeatures(batchDf, batchId):
   outDf = fs.score_batch(model_uri, batchDf)
-  deltaTable = DeltaTable.forName(spark, f'{gold_database_name}.insurance_claims')
+  deltaTable = DeltaTable.forName(spark, f'{database_name}.{gold_table_name}')
   source = outDf
   deltaTable.alias("u").merge(
     source = source.alias("staged_updates"),
@@ -70,7 +70,7 @@ fs = FeatureStoreClient()
 query = insuranceFeaturesDf.join(insuranceClaimsDf, ['policy_number', 'injury_claim', 'property_claim', 'vehicle_claim']).select(insuranceClaimsDf['*'], insuranceFeaturesDf['incident_weekend_flag']) \
             .writeStream \
             .foreachBatch(scoreFeatures) \
-            .option('checkpointLocation', f'{checkpointLocation}/gold_insurance_claims')
+            .option('checkpointLocation', f'{checkpointLocation}/{gold_table_name}')
 
 if triggerOnce=='true':
   query = query.trigger(once=True)
@@ -79,4 +79,4 @@ query.start()
 
 # COMMAND ----------
 
-#display(spark.sql(f'''SELECT * FROM {gold_database_name}.insurance_claims'''))
+#display(spark.sql(f'''SELECT * FROM {database_name}.{gold_table_name}'''))

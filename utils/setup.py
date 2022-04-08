@@ -4,12 +4,13 @@
 # COMMAND ----------
 
 user = dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().apply('user')
-database_name = user.split("@")[0].replace(".", "_").replace("-", "_").replace("+", "_")
-bronze_database_name = f'{database_name}_bronze'
-silver_database_name = f'{database_name}_silver'
-gold_database_name = f'{database_name}_gold'
-features_database_name = f'{database_name}_features'
-model_name = f'{database_name}_InsuranceFraud'
+safe_user_name = user.split("@")[0].replace(".", "_").replace("-", "_").replace("+", "_")
+database_name = f'{safe_user_name}_db'
+bronze_table_name = f'insurance_claims_bronze'
+silver_table_name = f'insurance_claims_silver'
+gold_table_name = f'insurance_claims_gold'
+features_table_name = f'insurance_claims_features'
+model_name = f'{safe_user_name}_InsuranceFraud'
 
 # COMMAND ----------
 
@@ -24,7 +25,7 @@ spark.conf.set("spark.databricks.delta.properties.defaults.enableChangeDataFeed"
 
 # COMMAND ----------
 
-print(f'bronze_database_name = {bronze_database_name}')
-print(f'silver_database_name = {silver_database_name}')
-print(f'gold_database_name = {gold_database_name}')
-print(f'features_database_name = {features_database_name}')
+print(f'bronze_table_name = {database_name}.{bronze_table_name}')
+print(f'silver_table_name = {database_name}.{silver_table_name}')
+print(f'gold_table_name = {database_name}.{gold_table_name}')
+print(f'features_table_name = {database_name}.{features_table_name}')

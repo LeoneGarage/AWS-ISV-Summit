@@ -4,20 +4,20 @@
 # COMMAND ----------
 
 def bronzeClearCheckpoints():
-  dbutils.fs.rm(f'{checkpointLocation}/insurance_claims_bronze', True)
+  dbutils.fs.rm(f'{checkpointLocation}/{bronze_table_name}', True)
   dbutils.fs.rm(schemaLocation, True)
 
 # COMMAND ----------
 
 def bronzeRecreateTables():
   spark.sql(f"""
-CREATE DATABASE IF NOT EXISTS {bronze_database_name}
+CREATE DATABASE IF NOT EXISTS {database_name}
 """)
   spark.sql(f'''
-DROP TABLE IF EXISTS {bronze_database_name}.insurance_claims
+DROP TABLE IF EXISTS {database_name}.{bronze_table_name}
   ''')
   spark.sql(f'''
-CREATE TABLE IF NOT EXISTS {bronze_database_name}.insurance_claims (
+CREATE TABLE IF NOT EXISTS {database_name}.{bronze_table_name} (
   date_of_birth STRING,
   policy_number STRING,
   policy_bind_date STRING,

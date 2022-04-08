@@ -50,7 +50,7 @@ insurance_claims_response.createOrReplaceTempView("insurance_claims_response")
 # COMMAND ----------
 
 spark.sql(f"""
-CREATE OR REPLACE TABLE {features_database_name}.insurance_claims_response
+CREATE OR REPLACE TABLE {database_name}.insurance_claims_response
 USING DELTA AS
 SELECT * FROM insurance_claims_response
 """)
@@ -58,7 +58,7 @@ SELECT * FROM insurance_claims_response
 # COMMAND ----------
 
 spark.sql(f'''
-DROP TABLE IF EXISTS {features_database_name}.insurance_claims_training_set
+DROP TABLE IF EXISTS {database_name}.insurance_claims_training_set
 ''')
 
 # COMMAND ----------
@@ -73,8 +73,8 @@ fs = FeatureStoreClient()
 training_set = create_training_set(fs, 'fraud_reported')
 
 trainingDf = training_set.load_df().dropna()
-trainingDf.write.format('delta').mode('overwrite').saveAsTable(f'{features_database_name}.insurance_claims_training_set')
+trainingDf.write.format('delta').mode('overwrite').saveAsTable(f'{database_name}.insurance_claims_training_set')
 
 # COMMAND ----------
 
-#display(spark.sql(f'SELECT * FROM {features_database_name}.insurance_claims_training_set'))
+#display(spark.sql(f'SELECT * FROM {database_name}.insurance_claims_training_set'))
