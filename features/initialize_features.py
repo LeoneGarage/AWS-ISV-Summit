@@ -24,7 +24,7 @@ pyspark.sql.types.StructType.fromDDL = _parse_datatype_string
 # COMMAND ----------
 
 def featuresClearCheckpoints():
-  dbutils.fs.rm(f'{checkpointLocation}/{features_table_name}', True)
+  dbutils.fs.rm(f'{checkpointLocation}/insurance_claims_features', True)
 
 # COMMAND ----------
 
@@ -44,13 +44,13 @@ def featuresRecreateTables():
   spark.sql(f'''
 CREATE DATABASE IF NOT EXISTS {database_name}
 ''')
-  if not feature_table_exists(name=f'{database_name}.{features_table_name}'):
-    spark.sql(f'DROP TABLE IF EXISTS {database_name}.{features_table_name}')
+  if not feature_table_exists(name=f'{database_name}.insurance_claims_features'):
+    spark.sql(f'DROP TABLE IF EXISTS {database_name}.insurance_claims_features')
     feature_table = fs.create_table(
-      name=f'{database_name}.{features_table_name}',
+      name=f'{database_name}.insurance_claims_features',
       primary_keys=['policy_number', 'injury_claim', 'property_claim', 'vehicle_claim'],
       schema=pyspark.sql.types.StructType.fromDDL(tableSchema),
-      description=f'These features are derived from the {database_name}.{features_table_name} table in the lakehouse.'
+      description=f'These features are derived from the {database_name}.insurance_claims_features table in the lakehouse.'
     )
 
 # COMMAND ----------

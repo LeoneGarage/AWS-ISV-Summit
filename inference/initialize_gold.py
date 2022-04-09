@@ -4,17 +4,17 @@
 # COMMAND ----------
 
 def goldClearCheckpoints():
-  dbutils.fs.rm(f'{checkpointLocation}/{gold_table_name}', True)
+  dbutils.fs.rm(f'{checkpointLocation}/insurance_claims_gold', True)
 
 # COMMAND ----------
 
 def goldRecreateTables():
-  spark.sql(f'DROP TABLE IF EXISTS {database_name}.{gold_table_name}')
+  spark.sql(f'DROP TABLE IF EXISTS {database_name}.insurance_claims_gold')
   spark.sql(f"""
 CREATE DATABASE IF NOT EXISTS {database_name}
 """)
   spark.sql(f"""
-CREATE TABLE IF NOT EXISTS {database_name}.{gold_table_name}(
+CREATE TABLE IF NOT EXISTS {database_name}.insurance_claims_gold(
 date_of_birth DATE,
 policy_number INT,
 policy_bind_date DATE,

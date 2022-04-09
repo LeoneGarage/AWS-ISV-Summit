@@ -58,13 +58,13 @@ insurance_claims_input = (spark.readStream.format("cloudFiles")
 query = insurance_claims_input \
   .selectExpr([f"`{c}` as {c.replace(' ', '_').replace('-', '_').replace('?', '')}" for c in insurance_claims_input.columns]) \
   .writeStream.format("delta") \
-  .option('checkpointLocation', f'{checkpointLocation}/{bronze_table_name}')
+  .option('checkpointLocation', f'{checkpointLocation}/insurance_claims_bronze')
 
 if triggerOnce=='true':
   query = query.trigger(once=True)
 
-query.toTable(f'{database_name}.{bronze_table_name}')
+query.toTable(f'{database_name}.insurance_claims_bronze')
 
 # COMMAND ----------
 
-#display(spark.sql(f'SELECT * FROM {database_name}.{bronze_table_name}'))
+#display(spark.sql(f'SELECT * FROM {database_name}.insurance_claims_bronze'))

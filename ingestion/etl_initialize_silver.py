@@ -4,19 +4,19 @@
 # COMMAND ----------
 
 def silverClearCheckpoints():
-  dbutils.fs.rm(f'{checkpointLocation}/{silver_table_name}', True)
+  dbutils.fs.rm(f'{checkpointLocation}/insurance_claims_silver', True)
 
 # COMMAND ----------
 
 def silverRecreateTables():
   spark.sql(f"""
-  DROP TABLE IF EXISTS {database_name}.{silver_table_name}
+  DROP TABLE IF EXISTS {database_name}.insurance_claims_silver
   """)
   spark.sql(f"""
 CREATE DATABASE IF NOT EXISTS {database_name}
 """)
   spark.sql(f"""
-CREATE TABLE IF NOT EXISTS {database_name}.{silver_table_name}(
+CREATE TABLE IF NOT EXISTS {database_name}.insurance_claims_silver(
 date_of_birth DATE,
 policy_number INT,
 policy_bind_date DATE,

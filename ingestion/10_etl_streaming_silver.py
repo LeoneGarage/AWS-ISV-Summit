@@ -38,7 +38,7 @@ from delta.tables import *
 
 # COMMAND ----------
 
-bronzeInsuranceClaimsDf = spark.readStream.format("delta").table(f"{database_name}.{bronze_table_name}")
+bronzeInsuranceClaimsDf = spark.readStream.format("delta").table(f"{database_name}.insurance_claims_bronze")
 
 # COMMAND ----------
 
@@ -50,7 +50,7 @@ bronzeInsuranceClaimsDf = spark.readStream.format("delta").table(f"{database_nam
 # COMMAND ----------
 
 def upsertToSilver(batchDf, batchId):
-  deltaTable = DeltaTable.forName(spark, f'{database_name}.{silver_table_name}')
+  deltaTable = DeltaTable.forName(spark, f'{database_name}.insurance_claims_silver')
   source = batchDf
   deltaTable.alias("u").merge(
     source = source.alias("staged_updates"),
@@ -110,14 +110,14 @@ query = bronzeInsuranceClaimsDf \
    ]) \
   .writeStream.format("delta") \
   .foreachBatch(upsertToSilver) \
-  .option('checkpointLocation', f'{checkpointLocation}/{silver_table_name}')
+  .option('checkpointLocation', f'{checkpointLocation}/insurance_claims_silver')
 
 if triggerOnce=='true':
   query = query.trigger(once=True)
 
 query.start()
-#query.toTable(f'{database_name}.{silver_table_name}')
+#query.toTable(f'{database_name}.insurance_claims_silver')
 
 # COMMAND ----------
 
-#display(spark.sql(f'SELECT * FROM {database_name}.{silver_table_name}'))
+#display(spark.sql(f'SELECT * FROM {database_name}.insurance_claims_silver'))

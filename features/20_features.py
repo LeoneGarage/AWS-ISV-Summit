@@ -56,10 +56,10 @@ def compute_features(data):
 # COMMAND ----------
 
 def incremental_features():
-  # This table will be recomputed incrementalle by reading the silver table stream
+  # This table will be recomputed incrementally by reading the silver table stream
   # when it is updated.
   
-  df = spark.readStream.format("delta").option("readChangeFeed", "true").table(f"{database_name}.{silver_table_name}")
+  df = spark.readStream.format("delta").option("readChangeFeed", "true").table(f"{database_name}.insurance_claims_silver")
   return compute_features(df).where("_change_type != 'update_preimage'").drop('_change_type', '_commit_version', '_commit_timestamp')
 
 # COMMAND ----------
@@ -76,14 +76,14 @@ features_df = incremental_features()
 
 if triggerOnce=='true':
   fs.write_table(df=features_df,
-                 name=f'{database_name}.{features_table_name}',
-                 checkpoint_location=f'{checkpointLocation}/{features_table_name}',
+                 name=f'{database_name}.insurance_claims_features',
+                 checkpoint_location=f'{checkpointLocation}/insurance_claims_features',
                  trigger={'once': True },
                  mode='merge')
 else:
   fs.write_table(df=features_df,
-                 name=f'{database_name}.{features_table_name}',
-                 checkpoint_location=f'{checkpointLocation}/{features_table_name}',
+                 name=f'{database_name}.insurance_claims_features',
+                 checkpoint_location=f'{checkpointLocation}/insurance_claims_features',
                  mode='merge')
 
 # COMMAND ----------
