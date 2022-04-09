@@ -1,8 +1,7 @@
 -- Databricks notebook source
-CREATE INCREMENTAL LIVE TABLE insurance_claims_bronze
+CREATE STREAMING LIVE TABLE insurance_claims_bronze AS
   SELECT
-  `months as customer` as months_as_customer,
-  `age` as age,
+  `date of birth` as date_of_birth,
   `policy number` as policy_number,
   `policy bind date` as policy_bind_date,
   `policy state` as policy_state,
@@ -38,13 +37,12 @@ CREATE INCREMENTAL LIVE TABLE insurance_claims_bronze
   `vehicle claim` as vehicle_claim,
   `auto make` as auto_make,
   `auto model` as auto_model,
-  `auto year` as auto_year,
-  `fraud reported` as fraud_reported
+  `auto year` as auto_year
   FROM cloud_files(
         "${fraud_pipeline.raw_path}", 
         "csv", 
         map("cloudFiles.format", "csv",
             "header", "true",
-            "cloudFiles.inferColumnTypes", "true",
+            "cloudFiles.inferColumnTypes", "false",
             "cloudFiles.schemaLocation", "${fraud_pipeline.schema_path}")
       )

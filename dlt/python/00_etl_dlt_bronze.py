@@ -12,7 +12,7 @@ def incremental_bronze():
 
   insurance_claims_input = ( spark.readStream.format("cloudFiles")
       .option("cloudFiles.format", "csv")
-      .option("cloudFiles.inferColumnTypes", True)
+      .option("cloudFiles.inferColumnTypes", False)
       .option("cloudFiles.schemaLocation", spark.conf.get("fraud_pipeline.schema_path"))
       .options(header='true')
       .load(spark.conf.get("fraud_pipeline.raw_path")) )
