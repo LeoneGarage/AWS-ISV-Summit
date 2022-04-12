@@ -116,7 +116,6 @@ if triggerOnce=='true':
   query = query.trigger(once=True)
 
 query.start()
-#query.toTable(f'{database_name}.insurance_claims_silver')
 
 # COMMAND ----------
 

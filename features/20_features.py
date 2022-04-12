@@ -88,4 +88,4 @@ else:
 
 # COMMAND ----------
 
-#display(spark.sql(f'''SELECT * FROM {database_name}.{features_table_name}'''))
+#display(spark.sql(f'''SELECT * FROM {database_name}.insurance_claims_features'''))
