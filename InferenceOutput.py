@@ -7,7 +7,7 @@ from pyspark.sql.functions import *
 
 # COMMAND ----------
 
-spark.read.format('delta').table(f'{database_name}.{gold_table_name}').count()
+spark.read.format('delta').table(f'{database_name}.insurance_claims_gold').count()
 
 # COMMAND ----------
 
@@ -17,7 +17,7 @@ spark.read.format('delta').table(f'{database_name}.{gold_table_name}').count()
 
 # COMMAND ----------
 
-df = (spark.readStream.format('delta').table(f'{database_name}.{gold_table_name}')
+df = (spark.readStream.format('delta').table(f'{database_name}.insurance_claims_gold')
           .groupBy(col('insured_hobbies'))
           .agg(sum('prediction').alias('prediction'))
           .orderBy('insured_hobbies'))
