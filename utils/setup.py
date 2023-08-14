@@ -1,4 +1,10 @@
 # Databricks notebook source
+# MAGIC %sql
+# MAGIC
+# MAGIC USE CATALOG leone_catalog
+
+# COMMAND ----------
+
 # MAGIC %run ./udfs
 
 # COMMAND ----------
