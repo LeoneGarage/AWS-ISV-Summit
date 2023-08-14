@@ -21,7 +21,7 @@ dbutils.widgets.text("triggerOnce", "true")
 from pyspark.sql.functions import *
 from databricks.feature_store import FeatureStoreClient
 from databricks.feature_store import feature_table
-import databricks.koalas as ks
+import pyspark.pandas as ks
 
 # COMMAND ----------
 
@@ -30,7 +30,7 @@ triggerOnce = dbutils.widgets.getArgument("triggerOnce")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 
+# MAGIC
 # MAGIC ### This is where we do feature engineering.
 # MAGIC ### We are reading the Change Data Feed from Delta and doing some minor transformations on the fly before saving the Feature Table as Delta table.
 
@@ -65,7 +65,7 @@ def incremental_features():
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 
+# MAGIC
 # MAGIC ### We use Feature Store library to write our features to Feature Store
 
 # COMMAND ----------
