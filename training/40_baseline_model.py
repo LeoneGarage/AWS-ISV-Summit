@@ -243,6 +243,10 @@ model
 
 # COMMAND ----------
 
+from mlflow.models import Model
+from mlflow.pyfunc import PyFuncModel
+from mlflow import pyfunc
+
 # Enable automatic logging of input samples, metrics, parameters, and models
 mlflow.sklearn.autolog(log_input_examples=True, silent=True)
 
@@ -257,17 +261,45 @@ with mlflow.start_run(run_name="random_forest") as mlflow_run:
       registered_model_name=model_name
     )
 
-    # Training metrics are logged by MLflow autologging
+    # Log metrics for the training set
+    mlflow_model = Model()
+    pyfunc.add_to_model(mlflow_model, loader_module="mlflow.sklearn")
+    pyfunc_model = PyFuncModel(model_meta=mlflow_model, model_impl=model)
+    training_eval_result = mlflow.evaluate(
+        model=pyfunc_model,
+        data=X_train.assign(**{str(target_col):y_train}),
+        targets=target_col,
+        model_type="classifier",
+        evaluator_config = {"log_model_explainability": False,
+                            "metric_prefix": "training_" , "pos_label": 1 }
+    )
+    xgbc_training_metrics = training_eval_result.metrics
     # Log metrics for the validation set
-    # skrf_val_metrics = mlflow.evaluate(model=model, data=X_val, targets=y_val, model_type="classifier")
+    val_eval_result = mlflow.evaluate(
+        model=pyfunc_model,
+        data=X_val.assign(**{str(target_col):y_val}),
+        targets=target_col,
+        model_type="classifier",
+        evaluator_config = {"log_model_explainability": False,
+                            "metric_prefix": "val_" , "pos_label": 1 }
+    )
+    xgbc_val_metrics = val_eval_result.metrics
+    # Log metrics for the test set
+    test_eval_result = mlflow.evaluate(
+        model=pyfunc_model,
+        data=X_test.assign(**{str(target_col):y_test}),
+        targets=target_col,
+        model_type="classifier",
+        evaluator_config = {"log_model_explainability": False,
+                            "metric_prefix": "test_" , "pos_label": 1 }
+    )
+    xgbc_test_metrics = test_eval_result.metrics
 
-    # # Log metrics for the test set
-    # skrf_test_metrics = mlflow.sklearn.evaluate(model=model, data=X_test, targets=y_test, model_type="classifier")
+    loss = -xgbc_val_metrics["val_f1_score"]
 
-    # # Display the logged metrics
-    # skrf_val_metrics = {k: v for k, v in skrf_val_metrics.items()}
-    # skrf_test_metrics = {k: v for k, v in skrf_test_metrics.items()}
-    # display(pd.DataFrame([skrf_val_metrics, skrf_test_metrics], index=["validation", "test"]))
+    # Truncate metric key names so they can be displayed together
+    xgbc_val_metrics = {k.replace("val_", ""): v for k, v in xgbc_val_metrics.items()}
+    xgbc_test_metrics = {k.replace("test_", ""): v for k, v in xgbc_test_metrics.items()}
 
 # COMMAND ----------
 
