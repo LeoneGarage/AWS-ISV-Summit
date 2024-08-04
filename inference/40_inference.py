@@ -9,7 +9,7 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 
+# MAGIC
 # MAGIC ### In this case inference is done as part of the stream, using Feature Store score_batch() API. So the data coming in via a stream in this case could only be a policy_number. Since the features would already updated separately in the Feature Store, score_batch() API just joins the policy_number to the features in the Feature Store and does inference after that on the model associated with the features in 30_baseline_model Notebook when the model was fitted.
 # MAGIC ### Note, I'm only deleting the checkpoint location and dropping the gold table for demo purposes so the pipeline starts from begining everytime it's run. You would not be doing this in production.
 
@@ -31,9 +31,12 @@ from delta.tables import *
 # COMMAND ----------
 
 def get_latest_model(model_name):
-  latest_version = 1
+  max_version = 0
+  for v in [int(m.version) for m in MlflowClient().search_model_versions(f"name='leone_catalog.default.leon_eller_insurancefraud'")]:
+    if v > max_version:
+      max_version = v
   mlflow_client = MlflowClient()
-  return mlflow_client.get_latest_versions(model_name, stages=['None'])[0]
+  return mlflow_client.get_registered_model(f"leone_catalog.default.{model_name}")
 
 
 # COMMAND ----------
@@ -43,8 +46,12 @@ insuranceFeaturesDf = spark.readStream.format("delta").option("readChangeFeed", 
 
 # COMMAND ----------
 
+get_latest_model(model_name)
+
+# COMMAND ----------
+
 model_info = get_latest_model(model_name)
-model_uri = f'models:/{model_name}/{model_info.version}'
+model_uri = f'models:/{model_name}@{list(model_info.aliases.keys())[0]}'
 
 # COMMAND ----------
 
@@ -80,3 +87,13 @@ query.start()
 # COMMAND ----------
 
 #display(spark.sql(f'''SELECT * FROM {database_name}.insurance_claims_gold'''))
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC select count(*) from leone_catalog.leon_eller_db.insurance_claims_features
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT count(*) FROM leone_catalog.leon_eller_db.insurance_claims_gold

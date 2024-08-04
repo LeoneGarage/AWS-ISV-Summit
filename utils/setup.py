@@ -9,7 +9,7 @@
 
 # COMMAND ----------
 
-user = dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().apply('user')
+user = spark.sql("SELECT current_user()").collect()[0][0]#dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().apply('user')
 safe_user_name = user.split("@")[0].replace(".", "_").replace("-", "_").replace("+", "_")
 database_name = f'{safe_user_name}_db'
 model_name = f'{safe_user_name}_InsuranceFraud'
@@ -31,3 +31,9 @@ print(f'bronze_table_name = {database_name}.insurance_claims_bronze')
 print(f'silver_table_name = {database_name}.insurance_claims_silver')
 print(f'gold_table_name = {database_name}.insurance_claims_gold')
 print(f'features_table_name = {database_name}.insurance_claims_features')
+
+# COMMAND ----------
+
+# MAGIC %environment
+# MAGIC "client": "1"
+# MAGIC "base_environment": ""
